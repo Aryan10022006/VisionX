@@ -1,0 +1,309 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.20;
+
+// Correct import paths for Scaffold-Eth Foundry
+import "forge-std/console.sol";
+import "openzeppelin-contracts/contracts/access/Ownable.sol";
+
+/**
+ * @title PropShare
+ * @author (Your Name) - Built for the 6-Hour Web3 Impact Hackathon
+ * @notice A single contract for fractional real-estate (RWA) tokenization,
+ * yield distribution, and governance. Built to be demo-ready in 6 hours.
+ */
+contract PropShare is Ownable {
+    // === STRUCTS ===
+
+    struct Property {
+        uint256 id;
+        string name;
+        string propertyURI; // Link to metadata (image, location, etc.)
+        uint256 totalShares;
+        uint256 sharesSold;
+        uint256 pricePerShare; // In WEI
+        uint256 rentBalance; // Accumulated rent in WEI
+        address payable manager; // The entity managing the physical property
+    }
+
+    struct Proposal {
+        uint256 id;
+        uint256 propertyId;
+        string description;
+        uint256 deadline; // Voting deadline
+        uint256 yesVotes;
+        uint256 noVotes;
+        bool executed;
+        mapping(address => bool) hasVoted;
+    }
+
+    // === STATE VARIABLES ===
+
+    // Property Management
+    uint256 private _nextPropertyId;
+    mapping(uint256 => Property) public properties;
+    // propertyId => userAddress => shareAmount
+    mapping(uint256 => mapping(address => uint256)) public sharesBalance;
+
+    // Governance
+    uint256 private _nextProposalId;
+    mapping(uint256 => Proposal) public proposals;
+
+    // === EVENTS ===
+
+    event PropertyTokenized(
+        uint256 indexed propertyId,
+        string name,
+        uint256 totalShares,
+        uint256 pricePerShare
+    );
+    event SharesPurchased(
+        uint256 indexed propertyId,
+        address indexed buyer,
+        uint256 amount,
+        uint256 cost
+    );
+    event RentDeposited(
+        uint256 indexed propertyId,
+        address indexed tenant,
+        uint256 amount
+    );
+    event YieldWithdrawn(
+        uint256 indexed propertyId,
+        address indexed owner,
+        uint256 amount
+    );
+    event ProposalCreated(
+        uint256 indexed proposalId,
+        uint256 indexed propertyId,
+        string description
+    );
+    event Voted(
+        uint256 indexed proposalId,
+        address indexed voter,
+        bool voteYes,
+        uint256 votingPower
+    );
+
+    // === CONSTRUCTOR ===
+
+    constructor(address initialOwner) Ownable(initialOwner) {
+        _nextPropertyId = 1;
+        _nextProposalId = 1;
+    }
+
+    // === CORE FUNCTIONS (FOR ADMIN) ===
+
+    /**
+     * @notice Admin function to list a new property for fractionalization.
+     */
+    function tokenizeProperty(
+        string calldata _name,
+        string calldata _propertyURI,
+        uint256 _totalShares,
+        uint256 _pricePerShare, // e.g., 10000000000000000 WEI (0.01 ETH)
+        address payable _manager
+    ) external onlyOwner {
+        require(_totalShares > 0, "Must have shares");
+        require(_pricePerShare > 0, "Price must be > 0");
+        require(_manager != address(0), "Invalid manager");
+
+        uint256 propertyId = _nextPropertyId++;
+        properties[propertyId] = Property({
+            id: propertyId,
+            name: _name,
+            propertyURI: _propertyURI,
+            totalShares: _totalShares,
+            sharesSold: 0,
+            pricePerShare: _pricePerShare,
+            rentBalance: 0,
+            manager: _manager
+        });
+
+        emit PropertyTokenized(
+            propertyId,
+            _name,
+            _totalShares,
+            _pricePerShare
+        );
+    }
+
+    // === CORE FUNCTIONS (FOR USERS) ===
+
+    /**
+     * @notice Buy shares in a property (funds held in escrow until fully funded)
+     */
+    function buyShares(uint256 _propertyId, uint256 _amount) external payable {
+        Property storage prop = properties[_propertyId];
+        require(prop.id != 0, "Property does not exist");
+        require(!prop.isFunded, "Property already fully funded");
+        require(_amount > 0, "Amount must be > 0");
+        require(prop.sharesSold + _amount <= prop.totalShares, "Not enough shares available");
+
+        uint256 cost = _amount * prop.pricePerShare;
+        require(msg.value == cost, "Incorrect payment amount");
+
+        // Update balances
+        sharesBalance[_propertyId][msg.sender] += _amount;
+        prop.sharesSold += _amount;
+        
+        // Add funds to escrow instead of sending directly to manager
+        prop.fundsRaised += cost;
+
+        // Check if property is now fully funded
+        if (prop.sharesSold == prop.totalShares) {
+            prop.isFunded = true;
+            emit PropertyFunded(_propertyId);
+        }
+
+        emit SharesPurchased(msg.sender, _propertyId, _amount);
+    }
+    
+    /**
+     * @notice Manager withdraws funds after property is fully funded
+     * @dev Protects investors from manager running away with partial funding
+     */
+    function managerWithdrawFunds(uint256 _propertyId) external {
+        Property storage prop = properties[_propertyId];
+        require(msg.sender == prop.manager, "Not the manager");
+        require(prop.isFunded, "Property not fully funded");
+        require(prop.fundsRaised > 0, "Funds already withdrawn");
+        
+        uint256 amount = prop.fundsRaised;
+        prop.fundsRaised = 0; // Prevent re-entrancy
+        
+        (bool success, ) = prop.manager.call{value: amount}("");
+        require(success, "Transfer to manager failed");
+        
+        emit ManagerWithdrewFunds(_propertyId, amount);
+    }
+
+    /**
+     * @notice Property manager deposits verified rent (oracle-verified amount)
+     * @dev Manager must deposit EXACT verified amount - prevents dishonest reporting
+     */
+    function depositRent(uint256 _propertyId) external payable {
+        Property storage prop = properties[_propertyId];
+        require(prop.id != 0, "Property does not exist");
+        require(msg.sender == prop.manager, "Only manager can deposit rent");
+        
+        // Get oracle-verified rent amount
+        uint256 rentOwed = verifiedRentOwed[_propertyId];
+        require(rentOwed > 0, "Rent not yet verified");
+        require(msg.value == rentOwed, "Rent must match verified amount");
+
+        prop.rentBalance += msg.value;
+        
+        // Reset verified amount to prevent replay attacks
+        verifiedRentOwed[_propertyId] = 0;
+        
+        emit RentDeposited(_propertyId, msg.value);
+    }
+
+    /**
+     * @notice Shareholder function to withdraw their portion of the rent.
+     */
+    function withdrawYield(uint256 _propertyId) external {
+        Property storage prop = properties[_propertyId];
+        uint256 userShares = sharesBalance[_propertyId][msg.sender];
+        require(userShares > 0, "Not a shareholder");
+
+        uint256 totalRent = prop.rentBalance;
+        if (totalRent == 0) {
+            revert("No rent to withdraw");
+        }
+
+        // Calculate user's claimable yield
+        // (userShares * totalRent) / totalShares
+        uint256 claimable = (userShares * totalRent) / prop.totalShares;
+        require(claimable > 0, "No yield to claim");
+
+        // Update rent balance *before* sending ETH (checks-effects-interactions)
+        prop.rentBalance -= claimable;
+
+        // Send yield
+        (bool success, ) = msg.sender.call{value: claimable}("");
+        require(success, "Yield withdrawal failed");
+
+        emit YieldWithdrawn(_propertyId, msg.sender, claimable);
+    }
+
+    // === GOVERNANCE FUNCTIONS ===
+
+    /**
+     * @notice Shareholder function to create a new governance proposal.
+     */
+    function createProposal(uint256 _propertyId, string calldata _description)
+        external
+    {
+        require(
+            sharesBalance[_propertyId][msg.sender] > 0,
+            "Only shareholders can create proposals"
+        );
+
+        uint256 proposalId = _nextProposalId++;
+        proposals[proposalId] = Proposal({
+            id: proposalId,
+            propertyId: _propertyId,
+            description: _description,
+            deadline: block.timestamp + 3 days, // 3-day vote (fine for demo)
+            yesVotes: 0,
+            noVotes: 0,
+            executed: false
+        });
+
+        emit ProposalCreated(proposalId, _propertyId, _description);
+    }
+
+    /**
+     * @notice Shareholder function to vote on a proposal.
+     * Voting power is based on share count.
+     */
+    function vote(uint256 _proposalId, bool _voteYes) external {
+        Proposal storage p = proposals[_proposalId];
+        require(p.id != 0, "Proposal not found");
+        require(block.timestamp < p.deadline, "Vote has ended");
+        require(!p.hasVoted[msg.sender], "Already voted");
+
+        uint256 votingPower = sharesBalance[p.propertyId][msg.sender];
+        require(votingPower > 0, "Not a shareholder of this property");
+
+        p.hasVoted[msg.sender] = true;
+
+        if (_voteYes) {
+            p.yesVotes += votingPower;
+        } else {
+            p.noVotes += votingPower;
+        }
+
+        emit Voted(_proposalId, msg.sender, _voteYes, votingPower);
+    }
+
+    // === VIEW FUNCTIONS ===
+
+    function getProperty(uint256 _propertyId)
+        external
+        view
+        returns (Property memory)
+    {
+        return properties[_propertyId];
+    }
+
+    function getProposal(uint256 _proposalId)
+        external
+        view
+        returns (Proposal memory)
+    {
+        return proposals[_proposalId];
+    }
+
+    /**
+     * @notice Helper to get user's share balance.
+     */
+    function getSharesBalance(uint256 _propertyId, address _user)
+        external
+        view
+        returns (uint256)
+    {
+        return sharesBalance[_propertyId][_user];
+    }
+}
