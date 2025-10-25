@@ -1,4 +1,4 @@
-# � PropShare - Fractional Real Estate Ownership on Blockchain
+# 🏠 PropShare - Fractional Real Estate Ownership on Blockchain
 
 > **Built for Web3 Impact Hackathon** | Democratizing Real Estate Investment through DeFi
 
