@@ -30,10 +30,14 @@ address: "0x700b6A60ce7EaAea56F065753d8dcB9653dBAD35"
 ### 3. **Demo ETH Funding Script** ✅
 **Problem**: No easy way to check account balances and addresses
 
-**Fix**: Created `fundDemoAccounts.js` script:
+**Fix**: Created `fundDemoAccounts.js` script (ES module format):
 ```bash
+# Run from WSL/Linux terminal:
 cd packages/foundry
 yarn demo:accounts
+
+# OR from project root:
+node packages/foundry/scripts-js/fundDemoAccounts.js
 ```
 
 **Shows**:
@@ -41,6 +45,8 @@ yarn demo:accounts
 - Current ETH balance for each
 - Which account is admin
 - Instructions for importing into MetaMask
+
+**Note**: Use WSL terminal or Git Bash on Windows, not PowerShell (due to UNC path issues)
 
 **Result**: Easy account management for demos!
 

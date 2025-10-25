@@ -7,13 +7,13 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     PropShare: {
-      address: "0x700b6A60ce7EaAea56F065753d8dcB9653dBAD35",
+      address: "0x700b6a60ce7eaaea56f065753d8dcb9653dbad35",
       abi: [
         {
           type: "constructor",
           inputs: [
             {
-              name: "_owner",
+              name: "initialOwner",
               type: "address",
               internalType: "address",
             },
@@ -25,12 +25,12 @@ const deployedContracts = {
           name: "buyShares",
           inputs: [
             {
-              name: "propertyId",
+              name: "_propertyId",
               type: "uint256",
               internalType: "uint256",
             },
             {
-              name: "amount",
+              name: "_amount",
               type: "uint256",
               internalType: "uint256",
             },
@@ -43,12 +43,12 @@ const deployedContracts = {
           name: "createProposal",
           inputs: [
             {
-              name: "propertyId",
+              name: "_propertyId",
               type: "uint256",
               internalType: "uint256",
             },
             {
-              name: "description",
+              name: "_description",
               type: "string",
               internalType: "string",
             },
@@ -61,7 +61,7 @@ const deployedContracts = {
           name: "depositRent",
           inputs: [
             {
-              name: "propertyId",
+              name: "_propertyId",
               type: "uint256",
               internalType: "uint256",
             },
@@ -104,6 +104,77 @@ const deployedContracts = {
               name: "",
               type: "uint256",
               internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getProperty",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "tuple",
+              internalType: "struct PropShare.Property",
+              components: [
+                {
+                  name: "id",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "name",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "propertyURI",
+                  type: "string",
+                  internalType: "string",
+                },
+                {
+                  name: "totalShares",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "sharesSold",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "pricePerShare",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "rentBalance",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "manager",
+                  type: "address",
+                  internalType: "address payable",
+                },
+                {
+                  name: "fundsRaised",
+                  type: "uint256",
+                  internalType: "uint256",
+                },
+                {
+                  name: "isFunded",
+                  type: "bool",
+                  internalType: "bool",
+                },
+              ],
             },
           ],
           stateMutability: "view",
@@ -164,10 +235,773 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getProperty",
+          name: "getSharesBalance",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_user",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "hasVoted",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "managerWithdrawFunds",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "owner",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "properties",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "id",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "name",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "propertyURI",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "totalShares",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "sharesSold",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "pricePerShare",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "rentBalance",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "manager",
+              type: "address",
+              internalType: "address payable",
+            },
+            {
+              name: "fundsRaised",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "isFunded",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "proposals",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "id",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "description",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "deadline",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "yesVotes",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "noVotes",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "executed",
+              type: "bool",
+              internalType: "bool",
+            },
+            {
+              name: "creator",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "renounceOwnership",
+          inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "setVerifier",
+          inputs: [
+            {
+              name: "_newVerifier",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "sharesBalance",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "submitVerifiedRent",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_amount",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "tokenizeProperty",
+          inputs: [
+            {
+              name: "_name",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_propertyURI",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_totalShares",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_pricePerShare",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_manager",
+              type: "address",
+              internalType: "address payable",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "transferOwnership",
+          inputs: [
+            {
+              name: "newOwner",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "verifiedRentOwed",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "verifier",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "vote",
+          inputs: [
+            {
+              name: "_proposalId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_voteYes",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "withdrawYield",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "event",
+          name: "ManagerWithdrewFunds",
           inputs: [
             {
               name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "OwnershipTransferred",
+          inputs: [
+            {
+              name: "previousOwner",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "newOwner",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "PropertyFunded",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "PropertyTokenized",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "name",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+            {
+              name: "totalShares",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "pricePerShare",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "ProposalCreated",
+          inputs: [
+            {
+              name: "proposalId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "description",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "ProposalExecuted",
+          inputs: [
+            {
+              name: "proposalId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "RentDeposited",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "depositor",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "RentVerified",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "SharesPurchased",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "buyer",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+            {
+              name: "cost",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "VerifierChanged",
+          inputs: [
+            {
+              name: "oldVerifier",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "newVerifier",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "Voted",
+          inputs: [
+            {
+              name: "proposalId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "voter",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "voteYes",
+              type: "bool",
+              indexed: false,
+              internalType: "bool",
+            },
+            {
+              name: "votingPower",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "YieldWithdrawn",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "owner",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "error",
+          name: "OwnableInvalidOwner",
+          inputs: [
+            {
+              name: "owner",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "OwnableUnauthorizedAccount",
+          inputs: [
+            {
+              name: "account",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+      ],
+      inheritedFunctions: {},
+      deployedOnBlock: 1,
+    },
+  },
+  11155111: {
+    PropShare: {
+      address: "0x5b73c5498c1e3b4dba84de0f1833c4a029d90519",
+      abi: [
+        {
+          type: "constructor",
+          inputs: [
+            {
+              name: "initialOwner",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "buyShares",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_amount",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
+        },
+        {
+          type: "function",
+          name: "createProposal",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_description",
+              type: "string",
+              internalType: "string",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "depositRent",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "payable",
+        },
+        {
+          type: "function",
+          name: "executeProposal",
+          inputs: [
+            {
+              name: "_proposalId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "getNextPropertyId",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getNextProposalId",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "getProperty",
+          inputs: [
+            {
+              name: "_propertyId",
               type: "uint256",
               internalType: "uint256",
             },
@@ -216,7 +1050,7 @@ const deployedContracts = {
                 {
                   name: "manager",
                   type: "address",
-                  internalType: "address",
+                  internalType: "address payable",
                 },
                 {
                   name: "fundsRaised",
@@ -235,77 +1069,61 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "getSharesBalance",
+          name: "getProposal",
           inputs: [
+            {
+              name: "_proposalId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "id",
+              type: "uint256",
+              internalType: "uint256",
+            },
             {
               name: "propertyId",
               type: "uint256",
               internalType: "uint256",
             },
             {
-              name: "user",
+              name: "description",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "deadline",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "yesVotes",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "noVotes",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "executed",
+              type: "bool",
+              internalType: "bool",
+            },
+            {
+              name: "creator",
               type: "address",
               internalType: "address",
             },
           ],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
           stateMutability: "view",
         },
         {
           type: "function",
-          name: "owner",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "address",
-              internalType: "address",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "propertyCount",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "proposalCount",
-          inputs: [],
-          outputs: [
-            {
-              name: "",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          stateMutability: "view",
-        },
-        {
-          type: "function",
-          name: "renounceOwnership",
-          inputs: [],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "submitVerifiedRent",
+          name: "getSharesBalance",
           inputs: [
             {
               name: "_propertyId",
@@ -313,26 +1131,43 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
-              name: "_rentAmount",
-              type: "uint256",
-              internalType: "uint256",
-            },
-          ],
-          outputs: [],
-          stateMutability: "nonpayable",
-        },
-        {
-          type: "function",
-          name: "setVerifier",
-          inputs: [
-            {
-              name: "_verifier",
+              name: "_user",
               type: "address",
               internalType: "address",
             },
           ],
-          outputs: [],
-          stateMutability: "nonpayable",
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "hasVoted",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
         },
         {
           type: "function",
@@ -349,7 +1184,7 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "verifier",
+          name: "owner",
           inputs: [],
           outputs: [
             {
@@ -362,8 +1197,20 @@ const deployedContracts = {
         },
         {
           type: "function",
-          name: "tokenizeProperty",
+          name: "properties",
           inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "id",
+              type: "uint256",
+              internalType: "uint256",
+            },
             {
               name: "name",
               type: "string",
@@ -380,14 +1227,182 @@ const deployedContracts = {
               internalType: "uint256",
             },
             {
+              name: "sharesSold",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
               name: "pricePerShare",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "rentBalance",
               type: "uint256",
               internalType: "uint256",
             },
             {
               name: "manager",
               type: "address",
+              internalType: "address payable",
+            },
+            {
+              name: "fundsRaised",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "isFunded",
+              type: "bool",
+              internalType: "bool",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "proposals",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "id",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "description",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "deadline",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "yesVotes",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "noVotes",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "executed",
+              type: "bool",
+              internalType: "bool",
+            },
+            {
+              name: "creator",
+              type: "address",
               internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "renounceOwnership",
+          inputs: [],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "setVerifier",
+          inputs: [
+            {
+              name: "_newVerifier",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "sharesBalance",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "submitVerifiedRent",
+          inputs: [
+            {
+              name: "_propertyId",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_amount",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [],
+          stateMutability: "nonpayable",
+        },
+        {
+          type: "function",
+          name: "tokenizeProperty",
+          inputs: [
+            {
+              name: "_name",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_propertyURI",
+              type: "string",
+              internalType: "string",
+            },
+            {
+              name: "_totalShares",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_pricePerShare",
+              type: "uint256",
+              internalType: "uint256",
+            },
+            {
+              name: "_manager",
+              type: "address",
+              internalType: "address payable",
             },
           ],
           outputs: [],
@@ -408,15 +1423,47 @@ const deployedContracts = {
         },
         {
           type: "function",
+          name: "verifiedRentOwed",
+          inputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+              internalType: "uint256",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
+          name: "verifier",
+          inputs: [],
+          outputs: [
+            {
+              name: "",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+          stateMutability: "view",
+        },
+        {
+          type: "function",
           name: "vote",
           inputs: [
             {
-              name: "proposalId",
+              name: "_proposalId",
               type: "uint256",
               internalType: "uint256",
             },
             {
-              name: "voteYes",
+              name: "_voteYes",
               type: "bool",
               internalType: "bool",
             },
@@ -429,13 +1476,32 @@ const deployedContracts = {
           name: "withdrawYield",
           inputs: [
             {
-              name: "propertyId",
+              name: "_propertyId",
               type: "uint256",
               internalType: "uint256",
             },
           ],
           outputs: [],
           stateMutability: "nonpayable",
+        },
+        {
+          type: "event",
+          name: "ManagerWithdrewFunds",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "amount",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
         },
         {
           type: "event",
@@ -458,25 +1524,13 @@ const deployedContracts = {
         },
         {
           type: "event",
-          name: "ProposalCreated",
+          name: "PropertyFunded",
           inputs: [
-            {
-              name: "proposalId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
-            },
             {
               name: "propertyId",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
-            },
-            {
-              name: "description",
-              type: "string",
-              indexed: false,
-              internalType: "string",
             },
           ],
           anonymous: false,
@@ -488,7 +1542,7 @@ const deployedContracts = {
             {
               name: "propertyId",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
             },
             {
@@ -503,6 +1557,50 @@ const deployedContracts = {
               indexed: false,
               internalType: "uint256",
             },
+            {
+              name: "pricePerShare",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "ProposalCreated",
+          inputs: [
+            {
+              name: "proposalId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "description",
+              type: "string",
+              indexed: false,
+              internalType: "string",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "ProposalExecuted",
+          inputs: [
+            {
+              name: "proposalId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
           ],
           anonymous: false,
         },
@@ -513,7 +1611,32 @@ const deployedContracts = {
             {
               name: "propertyId",
               type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "depositor",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "amount",
+              type: "uint256",
               indexed: false,
+              internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "RentVerified",
+          inputs: [
+            {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
               internalType: "uint256",
             },
             {
@@ -530,22 +1653,47 @@ const deployedContracts = {
           name: "SharesPurchased",
           inputs: [
             {
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
               name: "buyer",
               type: "address",
               indexed: true,
               internalType: "address",
             },
             {
-              name: "propertyId",
+              name: "amount",
               type: "uint256",
               indexed: false,
               internalType: "uint256",
             },
             {
-              name: "amount",
+              name: "cost",
               type: "uint256",
               indexed: false,
               internalType: "uint256",
+            },
+          ],
+          anonymous: false,
+        },
+        {
+          type: "event",
+          name: "VerifierChanged",
+          inputs: [
+            {
+              name: "oldVerifier",
+              type: "address",
+              indexed: true,
+              internalType: "address",
+            },
+            {
+              name: "newVerifier",
+              type: "address",
+              indexed: true,
+              internalType: "address",
             },
           ],
           anonymous: false,
@@ -557,7 +1705,7 @@ const deployedContracts = {
             {
               name: "proposalId",
               type: "uint256",
-              indexed: false,
+              indexed: true,
               internalType: "uint256",
             },
             {
@@ -572,6 +1720,12 @@ const deployedContracts = {
               indexed: false,
               internalType: "bool",
             },
+            {
+              name: "votingPower",
+              type: "uint256",
+              indexed: false,
+              internalType: "uint256",
+            },
           ],
           anonymous: false,
         },
@@ -580,16 +1734,16 @@ const deployedContracts = {
           name: "YieldWithdrawn",
           inputs: [
             {
-              name: "recipient",
+              name: "propertyId",
+              type: "uint256",
+              indexed: true,
+              internalType: "uint256",
+            },
+            {
+              name: "owner",
               type: "address",
               indexed: true,
               internalType: "address",
-            },
-            {
-              name: "propertyId",
-              type: "uint256",
-              indexed: false,
-              internalType: "uint256",
             },
             {
               name: "amount",
@@ -600,12 +1754,30 @@ const deployedContracts = {
           ],
           anonymous: false,
         },
+        {
+          type: "error",
+          name: "OwnableInvalidOwner",
+          inputs: [
+            {
+              name: "owner",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
+        {
+          type: "error",
+          name: "OwnableUnauthorizedAccount",
+          inputs: [
+            {
+              name: "account",
+              type: "address",
+              internalType: "address",
+            },
+          ],
+        },
       ],
-      inheritedFunctions: {
-        owner: "@openzeppelin/contracts/access/Ownable.sol",
-        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-      },
+      inheritedFunctions: {},
     },
   },
 } as const;

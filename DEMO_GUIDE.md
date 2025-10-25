@@ -3,11 +3,16 @@
 ## 🚀 QUICK START (5 Minutes)
 
 ### STEP 0: Fund Demo Accounts (Check ETH Balance)
-```powershell
+```bash
+# From WSL or Linux terminal (recommended):
 cd packages/foundry
 yarn demo:accounts
+
+# OR run directly from project root:
+node packages/foundry/scripts-js/fundDemoAccounts.js
 ```
 **This shows all test accounts with their balances and addresses** ✅
+**Note**: If on Windows, use WSL terminal or Git Bash, not PowerShell
 
 ### STEP 1: Start Local Blockchain
 ```powershell

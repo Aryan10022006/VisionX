@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
 import {
@@ -209,14 +210,16 @@ const PropertyDetailsPage = () => {
           {/* Property Header */}
           <div className="bg-base-100 rounded-xl shadow-lg overflow-hidden mb-8">
             <div className="relative h-80">
-              <img
+              <Image
                 src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=400&fit=crop"
                 alt={property.name}
+                width={1200}
+                height={400}
                 className="w-full h-full object-cover"
               />
               <div className="absolute top-4 right-4">
-                <span className={`badge ${property.isFunded ? 'badge-success' : 'badge-primary'} badge-lg`}>
-                  {property.isFunded ? 'Fully Funded' : 'Available'}
+                <span className={`badge ${property.isFunded ? "badge-success" : "badge-primary"} badge-lg`}>
+                  {property.isFunded ? "Fully Funded" : "Available"}
                 </span>
               </div>
             </div>
@@ -237,9 +240,9 @@ const PropertyDetailsPage = () => {
                   <span className="font-semibold">Funding Progress</span>
                   <span className="font-semibold">{fundingPercentage}%</span>
                 </div>
-                <progress 
-                  className="progress progress-primary w-full h-3" 
-                  value={fundingPercentage} 
+                <progress
+                  className="progress progress-primary w-full h-3"
+                  value={fundingPercentage}
                   max="100"
                 ></progress>
               </div>
@@ -300,7 +303,7 @@ const PropertyDetailsPage = () => {
                 {activeTab === "buy" && (
                   <div className="space-y-6">
                     <h3 className="text-2xl font-bold">Purchase Shares</h3>
-                    
+
                     {!property.isFunded ? (
                       <>
                         <div className="form-control">
@@ -314,7 +317,7 @@ const PropertyDetailsPage = () => {
                               placeholder="Enter amount"
                               className="input input-bordered flex-1"
                               value={sharesToBuy}
-                              onChange={(e) => setSharesToBuy(e.target.value)}
+                              onChange={e => setSharesToBuy(e.target.value)}
                               min="1"
                               max={availableShares.toString()}
                             />
@@ -330,9 +333,7 @@ const PropertyDetailsPage = () => {
                         <div className="bg-base-200 p-4 rounded-lg">
                           <div className="flex justify-between items-center">
                             <span className="font-semibold">Total Cost</span>
-                            <span className="text-2xl font-bold text-primary">
-                              {calculateTotalCost()} ETH
-                            </span>
+                            <span className="text-2xl font-bold text-primary">{calculateTotalCost()} ETH</span>
                           </div>
                         </div>
 
@@ -394,7 +395,7 @@ const PropertyDetailsPage = () => {
                               placeholder="0.5"
                               className="input input-bordered"
                               value={rentAmount}
-                              onChange={(e) => setRentAmount(e.target.value)}
+                              onChange={e => setRentAmount(e.target.value)}
                             />
                           </div>
                           <button
@@ -426,7 +427,7 @@ const PropertyDetailsPage = () => {
                               placeholder="0.5"
                               className="input input-bordered"
                               value={rentAmount}
-                              onChange={(e) => setRentAmount(e.target.value)}
+                              onChange={e => setRentAmount(e.target.value)}
                             />
                           </div>
                           <button

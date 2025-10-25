@@ -153,12 +153,12 @@ const Home: NextPage = () => {
 
           {/* Property Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {property1 && property1.id !== 0n && (
+            {property1 && property1.id !== 0n ? (
               <PropertyCard
                 property={{
                   id: Number(property1.id),
-                  name: property1.name || "Luxury Apartment - Downtown",
-                  location: "Mumbai, Maharashtra",
+                  name: property1.name || "Luxury Property",
+                  location: "Premium Location",
                   image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop",
                   totalShares: property1.totalShares,
                   sharesSold: property1.sharesSold,
@@ -169,15 +169,15 @@ const Home: NextPage = () => {
                 fundingPercentage={getFundingPercentage(property1)}
                 availableShares={getAvailableShares(property1)}
               />
-            )}
-
-            {/* Placeholder cards for upcoming properties */}
-            {(!property1 || property1.id === 0n) && (
+            ) : (
               <div className="col-span-full text-center py-16">
                 <BuildingOfficeIcon className="w-20 h-20 mx-auto text-base-content/20 mb-4" />
                 <h3 className="text-xl font-semibold mb-2 text-base-content/60">No Properties Yet</h3>
                 <p className="text-base-content/50">
                   Properties will appear here once they're tokenized by the admin
+                </p>
+                <p className="text-sm text-info mt-4">
+                  Connect with deployer wallet (0xf39Fd...92266) to access Admin Panel
                 </p>
               </div>
             )}

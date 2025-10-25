@@ -43,16 +43,20 @@ export const useAuth = () => {
       return;
     }
 
+    // Hardcoded deployer address (admin)
+    const DEPLOYER_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+
     // Check for admin override (for demo purposes)
     const adminOverride = typeof window !== "undefined" 
       ? localStorage.getItem("propshare_admin_override") 
       : null;
 
-    // Check if user is admin (either real contract owner or demo override)
+    // Check if user is admin - prioritize deployer address
+    const isDeployerAdmin = address.toLowerCase() === DEPLOYER_ADDRESS.toLowerCase();
     const isRealAdmin = contractOwner && address.toLowerCase() === contractOwner.toLowerCase();
     const isDemoAdmin = adminOverride && address.toLowerCase() === adminOverride.toLowerCase();
     
-    if (isRealAdmin || isDemoAdmin) {
+    if (isDeployerAdmin || isRealAdmin || isDemoAdmin) {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);

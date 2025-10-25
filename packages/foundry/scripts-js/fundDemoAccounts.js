@@ -2,12 +2,12 @@
 
 /**
  * Fund Demo Accounts with ETH
- * Transfers ETH from Hardhat test account #0 to other demo accounts
+ * Shows balances of all Hardhat/Anvil test accounts (each has 10,000 ETH)
  * 
  * Usage: node scripts-js/fundDemoAccounts.js
  */
 
-const { ethers } = require("ethers");
+import { ethers } from "ethers";
 
 // Hardhat/Anvil default accounts (these come with 10000 ETH each on localhost)
 const TEST_ACCOUNTS = [
