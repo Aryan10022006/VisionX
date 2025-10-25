@@ -45,6 +45,24 @@ Traditional real estate investing faces critical barriers:
 
 ## 🚀 Quick Start
 
+### For Testnet Deployment (Sepolia)
+
+**See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step guide**
+
+Quick overview:
+1. Get Alchemy API key
+2. Create `.env.local` with your key
+3. Get Sepolia ETH from faucets
+4. Deploy: `yarn deploy --network sepolia`
+5. Update contract address in `deployedContracts.ts`
+6. Push to Vercel for live demo
+
+**Quick Reference**: [QUICKSTART_SEPOLIA.md](./QUICKSTART_SEPOLIA.md)
+
+---
+
+### For Local Development
+
 ### Prerequisites
 - Node.js 18+ and Yarn
 - MetaMask or similar Web3 wallet
@@ -62,6 +80,8 @@ yarn install
 
 ### Running the Demo (3 Simple Steps)
 
+**For Local Development:**
+
 ```bash
 # Terminal 1: Start local blockchain (Anvil - part of Foundry)
 yarn chain
@@ -71,6 +91,15 @@ yarn deploy
 
 # Terminal 3: Start frontend
 yarn start
+```
+
+**For Testnet (Sepolia):**
+
+```bash
+# Already deployed to Sepolia
+# Just run frontend
+yarn start
+# Switch MetaMask to Sepolia network
 ```
 
 Visit **http://localhost:3000** to see PropShare in action!
