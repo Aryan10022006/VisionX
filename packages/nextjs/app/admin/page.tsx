@@ -50,12 +50,37 @@ const AdminPage = () => {
 
   // Handlers
   const handleTokenizeProperty = async () => {
-    if (!propertyName || !propertyURI || !totalShares || !pricePerShare || !managerAddress) {
-      alert("Please fill in all fields");
+    // Validation
+    if (!propertyName.trim()) {
+      alert("Please enter a property name");
+      return;
+    }
+    if (!propertyURI.trim()) {
+      alert("Please enter a property URI");
+      return;
+    }
+    if (!totalShares || Number(totalShares) <= 0) {
+      alert("Total shares must be greater than 0");
+      return;
+    }
+    if (!pricePerShare || Number(pricePerShare) <= 0) {
+      alert("Price per share must be greater than 0");
+      return;
+    }
+    if (!managerAddress || !managerAddress.startsWith("0x")) {
+      alert("Please enter a valid manager address");
       return;
     }
 
     try {
+      console.log("Tokenizing property with params:", {
+        propertyName,
+        propertyURI,
+        totalShares: BigInt(totalShares),
+        pricePerShare: parseEther(pricePerShare),
+        managerAddress,
+      });
+
       await tokenizeProperty({
         functionName: "tokenizeProperty",
         args: [
@@ -67,36 +92,48 @@ const AdminPage = () => {
         ],
       });
 
-      alert("Property tokenized successfully!");
+      alert("✅ Property tokenized successfully!");
       // Reset form
       setPropertyName("");
       setPropertyURI("");
       setTotalShares("");
       setPricePerShare("");
       setManagerAddress("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error tokenizing property:", error);
-      alert("Failed to tokenize property. Check console for details.");
+      const errorMessage = error?.message || "Unknown error";
+      alert(`❌ Failed to tokenize property:\n${errorMessage}\n\nCheck console for details.`);
     }
   };
 
   const handleSubmitVerifiedRent = async () => {
-    if (!rentPropertyId || !verifiedRent) {
-      alert("Please fill in all fields");
+    // Validation
+    if (!rentPropertyId || Number(rentPropertyId) <= 0) {
+      alert("Please enter a valid property ID");
+      return;
+    }
+    if (!verifiedRent || Number(verifiedRent) <= 0) {
+      alert("Verified rent must be greater than 0");
       return;
     }
 
     try {
+      console.log("Submitting verified rent:", {
+        propertyId: BigInt(rentPropertyId),
+        amount: parseEther(verifiedRent),
+      });
+
       await submitVerifiedRent({
         functionName: "submitVerifiedRent",
         args: [BigInt(rentPropertyId), parseEther(verifiedRent)],
       });
 
-      alert("Rent verified successfully!");
+      alert("✅ Rent verified successfully! Manager can now deposit this amount.");
       setVerifiedRent("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error verifying rent:", error);
-      alert("Failed to verify rent. Check console for details.");
+      const errorMessage = error?.message || "Unknown error";
+      alert(`❌ Failed to verify rent:\n${errorMessage}\n\nCheck console for details.`);
     }
   };
 
@@ -108,6 +145,17 @@ const AdminPage = () => {
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
             <p className="text-base-content/60">Manage properties, oracle, and platform settings</p>
+            
+            {/* Admin Status Info */}
+            <div className="alert alert-info mt-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current shrink-0 w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div className="text-sm">
+                <div className="font-semibold">Connected as Admin: {connectedAddress?.slice(0, 6)}...{connectedAddress?.slice(-4)}</div>
+                <div className="text-xs mt-1">Contract Owner: {contractOwner ? `${contractOwner.slice(0, 6)}...${contractOwner.slice(-4)}` : "Loading..."}</div>
+              </div>
+            </div>
           </div>
 
           {/* Platform Stats */}
@@ -235,12 +283,19 @@ const AdminPage = () => {
             <div className="space-y-6">
               {/* Submit Verified Rent */}
               <div className="bg-base-100 rounded-xl shadow-lg p-6">
-                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                  <ShieldCheckIcon className="w-7 h-7" />
-                  Oracle: Verify Rent
-                </h2>
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <ShieldCheckIcon className="w-7 h-7" />
+                Oracle: Verify Rent
+              </h2>
 
-                <div className="space-y-4">
+              <div className="alert alert-warning mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span className="text-sm">
+                  <strong>Workflow:</strong> First verify rent here, then the manager can deposit the exact verified amount.
+                </span>
+              </div>                <div className="space-y-4">
                   <div className="form-control">
                     <label className="label">
                       <span className="label-text font-semibold">Property ID</span>
