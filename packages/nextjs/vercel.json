@@ -1,7 +1,11 @@
 {
-  "installCommand": "yarn install",
   "buildCommand": "cd ../.. && yarn workspace @se-2/nextjs build",
   "devCommand": "yarn dev",
+  "installCommand": "yarn install",
   "framework": null,
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "env": {
+    "YARN_ENABLE_IMMUTABLE_INSTALLS": "false",
+    "ENABLE_EXPERIMENTAL_COREPACK": "1"
+  }
 }
